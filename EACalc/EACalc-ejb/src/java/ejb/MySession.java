@@ -29,13 +29,15 @@ public class MySession implements MySessionRemote {
     @Override
     @RolesAllowed("high")
     public double calcExp(int base, int exp) {
-        return pow(base, exp);
+        double result = pow(base, exp);
+        return result;
     }
 
     @Override
     @RolesAllowed("medium")
     public double squareRoot(int x) {
-        return (double)sqrt(x);
+        double result = sqrt(x);
+        return result;
     }
 
     @Override

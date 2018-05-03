@@ -7,7 +7,6 @@ package clientcalc;
 
 import ejb.MySessionRemote;
 import javax.ejb.EJB;
-import clientcalc.CalcUI;
 /**
  *
  * @author Tiago Matias
@@ -21,8 +20,7 @@ public class Main{
      */
     public static void main(String[] args) {
         // TODO code application logic here
-        
-        CalcUI calcui = new CalcUI();
+        CalcUI calcui = new CalcUI(mySession);
         calcui.setVisible(true);
         
         System.err.println("Test result = " + mySession.getResult());

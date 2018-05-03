@@ -1,7 +1,9 @@
 package clientcalc;
 
 import ejb.MySessionRemote;
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
+import javax.swing.JOptionPane;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -16,14 +18,15 @@ import javax.ejb.EJB;
 public class CalcUI extends javax.swing.JFrame {
 
     @EJB
-    private static MySessionRemote mySession;
+    private MySessionRemote mySession;
     private String operation = "";
-
+    
     /**
      * Creates new form CalcUI
      */
-    public CalcUI() {
+    public CalcUI(MySessionRemote session) {
         initComponents();
+        mySession = session;
     }
 
     /**
@@ -62,6 +65,8 @@ public class CalcUI extends javax.swing.JFrame {
 
         jTextArea1.setColumns(20);
         jTextArea1.setRows(5);
+        jTextArea1.setDisabledTextColor(new java.awt.Color(0, 0, 0));
+        jTextArea1.setEnabled(false);
         jScrollPane1.setViewportView(jTextArea1);
 
         jButCalc1.setText("1");
@@ -231,7 +236,7 @@ public class CalcUI extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 132, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButCalc1)
@@ -256,7 +261,7 @@ public class CalcUI extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButCalc0)
                     .addComponent(jButResult))
-                .addContainerGap(25, Short.MAX_VALUE))
+                .addGap(47, 47, 47))
         );
 
         pack();
@@ -320,7 +325,7 @@ public class CalcUI extends javax.swing.JFrame {
 
     private void jButExp1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButExp1ActionPerformed
         // TODO add your handling code here:
-        jTextArea1.append("^");
+        jTextArea1.append("exp");
         operation += "exp";
     }//GEN-LAST:event_jButExp1ActionPerformed
 
@@ -374,39 +379,102 @@ public class CalcUI extends javax.swing.JFrame {
         }
         //</editor-fold>
 
-        /* Create and display the form */
+        /* Create and display the form 
         java.awt.EventQueue.invokeLater(() -> {
-            new CalcUI().setVisible(true);
-        });
+            new CalcUI(args[0]).setVisible(true);
+        });        */
     }
     
-    
+    @RolesAllowed("low")
     public void makeCalculation() {
         if(operation.contains("square"))
         {
+            
             operation = "";
-            jTextArea1.append("Square\n");
-            double result = mySession.squareRoot(2);
-            System.err.println("Test result = " + result);
+            try{
+                double number = getNumber("√", true);
+                System.out.println("number: " + number);
+                double result = mySession.squareRoot((int)number);
+                System.err.println("Square = " + result);
+                jTextArea1.append("RootSquare: " + result+"\n");
+            }
+            catch (Exception e){
+                System.out.println("Exc: " + e);
+                jTextArea1.append("Operation Not Permitted\n");
+                
+                int dialogButton = JOptionPane.OK_CANCEL_OPTION;
+                int dialogResult = JOptionPane.showConfirmDialog (null, "Operation Not Permitted","Warning",dialogButton);
+                if(dialogResult == JOptionPane.OK_CANCEL_OPTION){
+                  // Saving code here
+                  
+                }
+                
+            }
         }
         else if(operation.contains("cubic"))
         {
             operation = "";
-            jTextArea1.append("Cubic\n");
-            //int result = (int)mySession.cubicSquare(8);
-            //jTextArea1.append("Result: " + result);
+            try{
+                double number = getNumber("√", true);
+                System.out.println("number: " + number);
+                double result = mySession.cubicSquare((int)number);
+                jTextArea1.append("cubicSquare: " + result+ "\n");
+            }
+            catch (Exception e){
+                System.out.println("Exc: " + e);
+                jTextArea1.append("Operation Not Permitted\n");
+                int dialogButton = JOptionPane.OK_CANCEL_OPTION;
+                int dialogResult = JOptionPane.showConfirmDialog (null, "Operation Not Permitted","Warning",dialogButton);
+                if(dialogResult == JOptionPane.OK_CANCEL_OPTION){
+                  // Saving code here
+                  
+                }
+            }
         }
         else if(operation.contains("log"))
         {
             operation = "";
-            int result = (int)mySession.opLog(10,10);
-            jTextArea1.append("Result: " + result);
+            try{
+                double base = getNumber("log", false);
+                System.out.println("base: " + base);
+                double exp = getNumber("log", true);
+                System.out.println("exp: " + exp);
+                double result = mySession.opLog((int)base,(int)exp);
+                jTextArea1.append("log: " + result + "\n");
+            }
+            catch (Exception e){
+                System.out.println("Exc: " + e);
+                jTextArea1.append("Operation Not Permitted\n");
+                int dialogButton = JOptionPane.OK_CANCEL_OPTION;
+                int dialogResult = JOptionPane.showConfirmDialog (null, "Operation Not Permitted","Warning",dialogButton);
+                if(dialogResult == JOptionPane.OK_CANCEL_OPTION){
+                  // Saving code here
+                  
+                }
+            }
+            
         }
         else if(operation.contains("exp"))
         {
             operation = "";
-            int result = (int)mySession.calcExp(2, 2);
-            jTextArea1.append("Result: " + result);
+            try{
+                double base = getNumber("exp", false);
+                System.out.println("base: " + base);
+                double exp = getNumber("exp", true);
+                System.out.println("exp: " + exp);
+                double result = mySession.calcExp((int)base,(int)exp);
+                jTextArea1.append("exp: " + result + "\n");
+            }
+            catch (Exception e){
+                System.out.println("Exc: " + e);
+                jTextArea1.append("Operation Not Permitted\n");
+                int dialogButton = JOptionPane.OK_CANCEL_OPTION;
+                int dialogResult = JOptionPane.showConfirmDialog (null, "Operation Not Permitted","Warning",dialogButton);
+                if(dialogResult == JOptionPane.OK_CANCEL_OPTION){
+                  // Saving code here
+                  
+                }
+            }
         }
         else{
             jTextArea1.append("Operation Not Permitted");
@@ -416,14 +484,40 @@ public class CalcUI extends javax.swing.JFrame {
         System.out.println("clientcalc.CalcUI.makeCalculation()");
     }
     
-    public Double reader() {
-        Double num;
-        String str;
-        str = jTextArea1.getText();
-        num = Double.valueOf(str);
-
-        return num;
+    public String getLastLine(String St){
+      String[] line = St.split("\n");
+      System.out.println(line);
+      System.out.println(line[line.length-1]);
+      return line[line.length-1];
     }
+
+    public String getLastLine(){
+          return getLastLine(jTextArea1.getText());
+    }
+    
+   public Double getNumber(String splitCondition, boolean afterBefore){
+       String str = getLastLine();
+       String[] parts = str.split(splitCondition);
+       System.out.println("Part1:"+parts[0]);
+       System.out.println("Part2:"+parts[1]);
+       Double num = 0.0;
+       if(afterBefore){
+           num = Double.valueOf(parts[1]);
+       }
+       else{
+           if(parts[0].contains("exp"))
+           {
+               parts[0] = parts[0].replace("exp", "");
+           }
+           if(parts[0].contains("log"))
+           {
+               parts[0] = parts[0].replace("log", "");
+           }
+           num = Double.valueOf(parts[0]);
+       }
+       
+       return num;
+   }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButCalc0;
